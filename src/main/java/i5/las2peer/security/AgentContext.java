@@ -23,8 +23,7 @@ import i5.las2peer.tools.CryptoException;
 import i5.las2peer.tools.SerializationException;
 
 /**
- * Each {@link i5.las2peer.execution.L2pThread} is bound to a context, which is determined by the executing
- * agent.
+ * Each {@link i5.las2peer.execution.L2pThread} is bound to a context, which is determined by the executing agent.
  */
 public class AgentContext implements AgentStorage, ContextStorageInterface {
 
@@ -74,10 +73,12 @@ public class AgentContext implements AgentStorage, ContextStorageInterface {
 	 * 
 	 * @param groupId
 	 * @return the unlocked GroupAgent of the given id
-	 * @throws AgentNotKnownException
+	 * @throws AgentNotKnownException If the agent is not found
+	 * @throws AgentException If any other issue with the agent occurs, e. g. XML not readable
 	 * @throws L2pSecurityException
 	 */
-	public GroupAgent requestGroupAgent(long groupId) throws AgentNotKnownException, L2pSecurityException {
+	public GroupAgent requestGroupAgent(long groupId)
+			throws AgentNotKnownException, AgentException, L2pSecurityException {
 		if (groupAgents.containsKey(groupId)) {
 			return groupAgents.get(groupId);
 		}
@@ -124,10 +125,11 @@ public class AgentContext implements AgentStorage, ContextStorageInterface {
 	 * 
 	 * @param agentId the requested agent
 	 * @return an unlocked agent instance
-	 * @throws AgentNotKnownException agent not found
+	 * @throws AgentNotKnownException If the agent is not found
+	 * @throws AgentException If any other issue with the agent occurs, e. g. XML not readable
 	 * @throws L2pSecurityException agent cannot be unlocked
 	 */
-	public Agent requestAgent(long agentId) throws AgentNotKnownException, L2pSecurityException {
+	public Agent requestAgent(long agentId) throws AgentNotKnownException, AgentException, L2pSecurityException {
 		if (agentId == getMainAgent().getId()) {
 			return getMainAgent();
 		} else {
@@ -217,10 +219,11 @@ public class AgentContext implements AgentStorage, ContextStorageInterface {
 	 * 
 	 * @param id
 	 * @return get the agent of the given id
-	 * @throws AgentNotKnownException
+	 * @throws AgentNotKnownException If the agent is not found
+	 * @throws AgentException If any other issue with the agent occurs, e. g. XML not readable
 	 */
 	@Override
-	public Agent getAgent(long id) throws AgentNotKnownException {
+	public Agent getAgent(long id) throws AgentNotKnownException, AgentException {
 		if (id == agent.getId()) {
 			return agent;
 		}
@@ -363,10 +366,11 @@ public class AgentContext implements AgentStorage, ContextStorageInterface {
 	 * 
 	 * @param agentId an agent id
 	 * @return true if the main agent has access to the given agent, otherwise false
-	 * @throws AgentNotKnownException agent not found
+	 * @throws AgentNotKnownException If the agent is not found
+	 * @throws AgentException If any other issue with the agent occurs, e. g. XML not readable
 	 * @throws AgentLockedException main agent is locked
 	 */
-	public boolean hasAccess(long agentId) throws AgentNotKnownException, AgentLockedException {
+	public boolean hasAccess(long agentId) throws AgentNotKnownException, AgentException, AgentLockedException {
 		if (getMainAgent().isLocked()) {
 			throw new AgentLockedException();
 		}

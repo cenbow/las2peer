@@ -14,6 +14,7 @@ import i5.las2peer.p2p.Node;
 import i5.las2peer.persistency.DecodingFailedException;
 import i5.las2peer.persistency.Envelope;
 import i5.las2peer.security.Agent;
+import i5.las2peer.security.AgentException;
 import i5.las2peer.security.AgentLockedException;
 import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.L2pSecurityException;
@@ -57,20 +58,23 @@ public interface Context {
 	 * 
 	 * @param groupId
 	 * @return the unlocked GroupAgent of the given id
-	 * @throws AgentNotKnownException
+	 * @throws AgentNotKnownException If the agent is not found
+	 * @throws AgentException If any other issue with the agent occurs, e. g. XML not readable
 	 * @throws L2pSecurityException
 	 */
-	public GroupAgent requestGroupAgent(long groupId) throws AgentNotKnownException, L2pSecurityException;
+	public GroupAgent requestGroupAgent(long groupId)
+			throws AgentNotKnownException, AgentException, L2pSecurityException;
 
 	/**
 	 * returns an unlocked instance of the requested Agent
 	 * 
 	 * @param agentId the requested agent
 	 * @return an unlocked agent instance
-	 * @throws AgentNotKnownException agent not found
+	 * @throws AgentNotKnownException If the agent is not found
+	 * @throws AgentException If any other issue with the agent occurs, e. g. XML not readable
 	 * @throws L2pSecurityException agent cannot be unlocked
 	 */
-	public Agent requestAgent(long agentId) throws AgentNotKnownException, L2pSecurityException;
+	public Agent requestAgent(long agentId) throws AgentNotKnownException, AgentException, L2pSecurityException;
 
 	/**
 	 * @deprecated Use {@link #fetchEnvelope(String)} instead.
@@ -113,8 +117,8 @@ public interface Context {
 	 * @throws StorageException
 	 */
 	@Deprecated
-	public Envelope getStoredObject(String className, String identifier) throws ArtifactNotFoundException,
-			StorageException;
+	public Envelope getStoredObject(String className, String identifier)
+			throws ArtifactNotFoundException, StorageException;
 
 	/**
 	 * Gives access to the local node.
@@ -129,9 +133,10 @@ public interface Context {
 	 * 
 	 * @param id
 	 * @return get the agent of the given id
-	 * @throws AgentNotKnownException
+	 * @throws AgentNotKnownException If the agent is not found
+	 * @throws AgentException If any other issue with the agent occurs, e. g. XML not readable
 	 */
-	public Agent getAgent(long id) throws AgentNotKnownException;
+	public Agent getAgent(long id) throws AgentNotKnownException, AgentException;
 
 	@Deprecated
 	public boolean hasAgent(long id);
@@ -163,10 +168,11 @@ public interface Context {
 	 * 
 	 * @param agentId an agent id
 	 * @return true if the main agent has access to the given agent, otherwise false
-	 * @throws AgentNotKnownException agent not found
+	 * @throws AgentNotKnownException If the agent is not found
+	 * @throws AgentException If any other issue with the agent occurs, e. g. XML not readable
 	 * @throws AgentLockedException main agent is locked
 	 */
-	public boolean hasAccess(long agentId) throws AgentNotKnownException, AgentLockedException;
+	public boolean hasAccess(long agentId) throws AgentNotKnownException, AgentException, AgentLockedException;
 
 	// Envelopes
 
@@ -186,8 +192,8 @@ public interface Context {
 	public Envelope createEnvelope(Envelope previousVersion, Serializable content, List<Agent> readers)
 			throws IllegalArgumentException, SerializationException, CryptoException;
 
-	public Envelope createUnencryptedEnvelope(String identifier, Serializable content) throws IllegalArgumentException,
-			SerializationException, CryptoException;
+	public Envelope createUnencryptedEnvelope(String identifier, Serializable content)
+			throws IllegalArgumentException, SerializationException, CryptoException;
 
 	public Envelope createUnencryptedEnvelope(Envelope previousVersion, Serializable content)
 			throws IllegalArgumentException, SerializationException, CryptoException;
@@ -202,11 +208,11 @@ public interface Context {
 	public void fetchEnvelopeAsync(String identifier, StorageEnvelopeHandler envelopeHandler,
 			StorageExceptionHandler exceptionHandler);
 
-	public Envelope createEnvelope(String identifier, Serializable content) throws IllegalArgumentException,
-			SerializationException, CryptoException;
+	public Envelope createEnvelope(String identifier, Serializable content)
+			throws IllegalArgumentException, SerializationException, CryptoException;
 
-	public Envelope createEnvelope(Envelope previousVersion, Serializable content) throws IllegalArgumentException,
-			SerializationException, CryptoException;
+	public Envelope createEnvelope(Envelope previousVersion, Serializable content)
+			throws IllegalArgumentException, SerializationException, CryptoException;
 
 	public void storeEnvelope(Envelope envelope) throws StorageException;
 

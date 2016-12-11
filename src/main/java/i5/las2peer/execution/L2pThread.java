@@ -20,6 +20,7 @@ import i5.las2peer.persistency.DecodingFailedException;
 import i5.las2peer.persistency.Envelope;
 import i5.las2peer.security.Agent;
 import i5.las2peer.security.AgentContext;
+import i5.las2peer.security.AgentException;
 import i5.las2peer.security.AgentLockedException;
 import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.L2pSecurityException;
@@ -185,12 +186,13 @@ public class L2pThread extends Thread implements Context {
 	}
 
 	@Override
-	public GroupAgent requestGroupAgent(long groupId) throws AgentNotKnownException, L2pSecurityException {
+	public GroupAgent requestGroupAgent(long groupId)
+			throws AgentNotKnownException, AgentException, L2pSecurityException {
 		return callerContext.requestGroupAgent(groupId);
 	}
 
 	@Override
-	public Agent requestAgent(long agentId) throws AgentNotKnownException, L2pSecurityException {
+	public Agent requestAgent(long agentId) throws AgentNotKnownException, AgentException, L2pSecurityException {
 		return callerContext.requestAgent(agentId);
 	}
 
@@ -200,13 +202,14 @@ public class L2pThread extends Thread implements Context {
 	}
 
 	@Override
-	public Envelope getStoredObject(Class<?> cls, String identifier) throws ArtifactNotFoundException, StorageException {
+	public Envelope getStoredObject(Class<?> cls, String identifier)
+			throws ArtifactNotFoundException, StorageException {
 		return null;
 	}
 
 	@Override
-	public Envelope getStoredObject(String className, String identifier) throws ArtifactNotFoundException,
-			StorageException {
+	public Envelope getStoredObject(String className, String identifier)
+			throws ArtifactNotFoundException, StorageException {
 		return null;
 	}
 
@@ -216,7 +219,7 @@ public class L2pThread extends Thread implements Context {
 	}
 
 	@Override
-	public Agent getAgent(long id) throws AgentNotKnownException {
+	public Agent getAgent(long id) throws AgentNotKnownException, AgentException {
 		return callerContext.getAgent(id);
 	}
 
@@ -231,7 +234,7 @@ public class L2pThread extends Thread implements Context {
 	}
 
 	@Override
-	public boolean hasAccess(long agentId) throws AgentNotKnownException, AgentLockedException {
+	public boolean hasAccess(long agentId) throws AgentNotKnownException, AgentException, AgentLockedException {
 		return callerContext.hasAccess(agentId);
 	}
 
@@ -270,8 +273,8 @@ public class L2pThread extends Thread implements Context {
 	}
 
 	@Override
-	public Envelope createUnencryptedEnvelope(String identifier, Serializable content) throws IllegalArgumentException,
-			SerializationException, CryptoException {
+	public Envelope createUnencryptedEnvelope(String identifier, Serializable content)
+			throws IllegalArgumentException, SerializationException, CryptoException {
 		return callerContext.createUnencryptedEnvelope(identifier, content);
 	}
 
@@ -304,14 +307,14 @@ public class L2pThread extends Thread implements Context {
 	}
 
 	@Override
-	public Envelope createEnvelope(String identifier, Serializable content) throws IllegalArgumentException,
-			SerializationException, CryptoException {
+	public Envelope createEnvelope(String identifier, Serializable content)
+			throws IllegalArgumentException, SerializationException, CryptoException {
 		return callerContext.createEnvelope(identifier, content);
 	}
 
 	@Override
-	public Envelope createEnvelope(Envelope previousVersion, Serializable content) throws IllegalArgumentException,
-			SerializationException, CryptoException {
+	public Envelope createEnvelope(Envelope previousVersion, Serializable content)
+			throws IllegalArgumentException, SerializationException, CryptoException {
 		return callerContext.createEnvelope(previousVersion, content);
 	}
 
@@ -358,7 +361,9 @@ public class L2pThread extends Thread implements Context {
 		} catch (L2pServiceException | InterruptedException e) {
 			throw new RemoteServiceException("The service seems not to be available.", e);
 		} catch (L2pSecurityException e) {
-			throw new IllegalStateException("Agent should be unlocked, but it isn't.");
+			throw new ServiceNotAvailableException("Agent should be unlocked, but it isn't.", e);
+		} catch (AgentException e) {
+			throw new ServiceNotAvailableException("Agent is not available", e);
 		}
 	}
 
